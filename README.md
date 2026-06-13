@@ -62,7 +62,3 @@ See requirements.txt
 👤 Author
 Lagudu Pooja Rani
 3rd Year B.Tech | Indian Institute of Technology Jodhpur
-
-3rd Year B.Tech | [Your College]
-
-[LinkedIn] | [GitHub]
