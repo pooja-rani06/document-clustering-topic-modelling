@@ -1,64 +1,38 @@
-# document-clustering-topic-modelling
-Unsupervised ML pipeline to cluster 20K news documents and discover hidden topics using K-Means, LDA, and t-SNE
+Document Clustering & Topic Modeling — 20 Newsgroups
+An unsupervised NLP pipeline that clusters ~4,300 real newsgroup posts into topics without using their labels, then checks how well the clusters line up with the true categories.
 
-📄 Document Clustering & Topic Modelling
+Dataset: 20 Newsgroups (via sklearn.datasets.fetch_20newsgroups), restricted to 5 categories: sci.med, sci.space, comp.graphics, rec.sport.hockey, talk.politics.guns.
 
-🔍 Overview
-An end-to-end unsupervised Machine Learning pipeline that automatically groups large collections of text documents into meaningful clusters and discovers hidden topics within them — without any labeled data.
-Applied on the 20 Newsgroups dataset (~20,000 news articles across 20 categories), this project demonstrates the full NLP + ML pipeline from raw text to interpretable insights.
+What it does
+Preprocessing — lowercases text, strips URLs/emails/file paths, removes stopwords (plus newsgroup-specific boilerplate like nntp, writes, article), and lemmatizes.
+TF-IDF vectorization — 8,000 features, unigrams + bigrams, min_df=5 / max_df=0.85 to cut noise.
+K-Means clustering — elbow method to pick k, then clusters at k=5 with k-means++ init.
+LDA topic modeling — 5 topics fit on a separate count-vectorized matrix.
+Dimensionality reduction — PCA (TruncatedSVD) and t-SNE for 2D visualization of cluster structure.
+Evaluation — silhouette score, cluster purity, NMI, and ARI against the ground-truth labels.
+Results
+Metric	Score
+Silhouette (cosine)	0.018
+Cluster Purity	0.669
+NMI	0.565
+ARI	—
+The silhouette score looks low in isolation, but that's expected for sparse, high-dimensional TF-IDF vectors (8,000 features, ~99% sparsity) — most documents end up roughly equidistant from each other in that space. Purity and NMI are more informative here: hockey and medicine clusters came out very clean (>0.99 purity), while space and medicine posts overlapped more in vocabulary, pulling many documents into one large cluster (49% of the corpus). LDA topics for graphics, space, and hockey mapped cleanly onto the known categories; one topic came out more generic, likely absorbing cross-category posts.
 
-🎯 Problem Statement
-Given a large collection of unlabeled documents:
-Can we automatically group similar documents together?
-Can we discover what "themes" or "topics" exist across the corpus?
-Can we visualize the cluster structure in 2D?
-
-🛠️ Tech Stack
-LibraryPurposescikit-learnTF-IDF Vectorization, K-Means Clustering, t-SNEnltkText preprocessing, stopword removalgensimLDA Topic Modellingmatplotlib / seabornVisualizationspyLDAvisInteractive topic visualization dashboardpandas / numpyData handling
-
-🧠 Concepts Covered:
-TF-IDF Vectorization — Converting raw text to numerical features
-K-Means Clustering — Grouping documents by vector similarity
-Elbow Method — Finding optimal number of clusters (K)
-Silhouette Score — Evaluating cluster quality
-LDA (Latent Dirichlet Allocation) — Probabilistic topic modelling
-Coherence Score — Evaluating topic quality
-t-SNE — Dimensionality reduction for 2D cluster visualization
-pyLDAvis — Interactive topic exploration
-
-📁 Project Structure
-
-document-clustering-topic-modelling/
-│
-├── document_clustering.ipynb   # Main notebook (in progress)
-├── requirements.txt            # Dependencies
+Project structure
+.
+├── document_clustering.py   # full pipeline, runs end-to-end
+├── requirements.txt
+├── plots/                   # generated on run: EDA, elbow, LDA topics, PCA, t-SNE, confusion heatmap
 └── README.md
+Running it
+bash
+pip install -r requirements.txt
+python document_clustering.py
+First run downloads the 20 Newsgroups dataset and NLTK stopword/lemmatizer data automatically. Plots are saved to plots/.
+
+Notes
+Random seeds are fixed (random_state=42) throughout for reproducibility.
+Silhouette is computed on a random sample of 2,000 documents (cosine distance is O(n²), too slow on the full corpus).
+t-SNE is run on a 50-dimensional PCA projection rather than the raw sparse matrix, for speed.
 
 
-🔄 Pipeline
-
-Raw Text
-   ↓
-Text Preprocessing (lowercasing, stopword removal, lemmatization)
-   ↓
-TF-IDF Vectorization
-   ↓
-K-Means Clustering ──────────────→ Elbow Method + Silhouette Score
-   ↓                                         ↓
-LDA Topic Modelling              t-SNE Cluster Visualization
-   ↓
-pyLDAvis Interactive Dashboard
-
-
-📊 Results (In Progress)
-MetricValueOptimal K (clusters)TBDSilhouette ScoreTBDLDA Coherence ScoreTBD
-
-📦 Requirements
-See requirements.txt
-
-🗂️ Dataset
-20 Newsgroups — A classic NLP benchmark dataset containing ~20,000 newsgroup posts across 20 categories including sports, politics, technology, religion, and more.
-
-👤 Author
-Lagudu Pooja Rani
-3rd Year B.Tech | Indian Institute of Technology Jodhpur
